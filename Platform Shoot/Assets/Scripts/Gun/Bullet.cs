@@ -6,7 +6,7 @@ public class Bullet : MonoBehaviour
 {
     [SerializeField] private float _moveSpeed = 10f;
     [SerializeField] private int _damageAmount = 1;
-
+    [SerializeField] private float _knockbackThrust = 20f;
 
     private Vector2 _fireDirection;
 
@@ -29,7 +29,7 @@ public class Bullet : MonoBehaviour
     public void Init(Gun gun, Vector2 bulletSpawnPoint, Vector2 mousePos)
     {
         _gun = gun;
-        transform.position = bulletSpawnPoint;
+        transform.position = bulletSpawnPoint; // Đặt vị trí của viên đạn bằng vị trí khởi tạo của viên đạn
         _fireDirection = (mousePos - bulletSpawnPoint).normalized; // Tính hướng bay theo hướng của chuột và vị trí khởi tạo viên đạn. .normalized sẽ giúp chúng ta chuẩn hóa hướng bay về 1
     }
 
@@ -37,6 +37,8 @@ public class Bullet : MonoBehaviour
     private void OnTriggerEnter2D(Collider2D other) {
         Health health = other.gameObject.GetComponent<Health>();
         health?.TakeDamage(_damageAmount);
+        Knockback knockback = other.gameObject.GetComponent<Knockback>();
+        knockback?.GetKnockBack(PlayerController.Instance.transform.position,_knockbackThrust);
         _gun.ReleaseBulletFromPool(this);
     }
 }

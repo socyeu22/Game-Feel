@@ -1,9 +1,12 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
+
+    public static Action OnJump;
     public static PlayerController Instance;
 
     [SerializeField] private Transform _feetTransform; // Đây là transform của hộp dưới chân nhân vật, dùng để kiểm tra xem nhân vật có đang đứng trên mặt đất không
@@ -13,13 +16,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _jumpStrength = 7f;
     [SerializeField] private float _extraGravity = 700f; // Trọng lực thêm khi nhân vật rơi xuống
     [SerializeField] private float _gravityDelay = 0.2f; // Thời gian trước khi trọng lực thêm được áp dụng(sau khi nhảy lên được 0.2s thì sẽ áp dụng lực thêm)
-
+    [SerializeField] private float _coyoteTime = 0.5f; // Thời gian nhân vật có thế nhảy sau khi rời khỏi mặt đất
+    private float _coyoteTimer; // Biến này dùng để đếm thời gian nhân vật rời khởi mặt đất dùng để so sánh với _coyoteTime 
+    private bool _doubleJumpAvailable = true;
     private float _timeInAir; // Thời gian nhân vật ở trạn thái trên không
 
     private PlayerInput _playerInput;
     private FrameInput _frameInput;
 
-    private bool _isGrounded = false;
+    // private bool _isGrounded = false;
     // private Vector2 _movement;
 
     private Rigidbody2D _rigidBody; // Rigidbody của nhân vật, cũng chính là Rigidbody ở Movement.cs vì cũng gắn vào cùng GameObject Player
@@ -32,12 +37,20 @@ public class PlayerController : MonoBehaviour
         _playerInput = GetComponent<PlayerInput>();
         _movement = GetComponent<Movement>();
     }
+    private void OnEnable(){
+        OnJump += ApplyJumpForce;
+    }
+
+    private void OnDisable(){
+        OnJump -= ApplyJumpForce;
+    }
 
     private void Update()
     {
         GatherInput();
         Movement();
-        Jump();
+        CoyoteTimer();
+        HandleJump();
         HandleSpriteFlip();
         GravityDelay();
     }
@@ -72,7 +85,7 @@ public class PlayerController : MonoBehaviour
 
     private void ExtraGravity(){
         if(_timeInAir > _gravityDelay){
-            _rigidBody.AddForce(new Vector2(0f, -_extraGravity * Time.fixedDeltaTime));
+            _rigidBody.AddForce(new Vector2(0f, -_extraGravity * Time.deltaTime));
         }
     }
 
@@ -91,15 +104,38 @@ public class PlayerController : MonoBehaviour
         _movement.SetCurrentDirection(_frameInput.Move.x);
     }
 
-    private void Jump()
+    private void HandleJump()
     {
         if(!_frameInput.Jump) return;
         if(CheckGrounded()){
-            _rigidBody.AddForce(Vector2.up * _jumpStrength, ForceMode2D.Impulse);
+            // _doubleJumpAvailable = false;
+            OnJump?.Invoke();
+        } else if(_coyoteTimer > 0f){
+            OnJump?.Invoke();
+        } else if(_doubleJumpAvailable){
+            _doubleJumpAvailable = false;
+            OnJump?.Invoke();
         }
         // if (Input.GetKeyDown(KeyCode.Space) && CheckGrounded()) {
         //     _rigidBody.AddForce(Vector2.up * _jumpStrength, ForceMode2D.Impulse);
         // }
+    }
+
+    private void CoyoteTimer(){
+        if(CheckGrounded()){
+            _coyoteTimer = _coyoteTime;
+            _doubleJumpAvailable = true;
+        }else{
+            _coyoteTimer -= Time.deltaTime;
+        }
+    }
+
+    // Hàm sẽ gọi để tác dụng lục nhảy lên nhân vật
+    private void ApplyJumpForce(){
+            _rigidBody.velocity = Vector2.zero; // Reset vận tốc của nhân vật trước khi nhảy
+            _timeInAir = 0f; // Reset thời gian nhân vật ở trạng thái trên không về 0
+            _coyoteTimer = 0f; // Reset thời gian nhân vật rời khỏi mặt đất về 0
+            _rigidBody.AddForce(Vector2.up * _jumpStrength, ForceMode2D.Impulse); //Tác dụng lực nhảy lên nhân vật
     }
 
     private void HandleSpriteFlip()
