@@ -6,6 +6,11 @@ public class Pipe : MonoBehaviour
 {
     [SerializeField] private Enemy _enemyPrefab;
     [SerializeField] private float _spawnTimer = 3f;
+    private ColorChanger _colorChanger;
+
+    private void Awake() {
+        _colorChanger = GetComponent<ColorChanger>();
+    }
 
     private void Start() {
         StartCoroutine(SpawnRoutine());
@@ -14,7 +19,9 @@ public class Pipe : MonoBehaviour
     private IEnumerator SpawnRoutine() {
         while (true)
         {
+            _colorChanger.SetRandomColor();
             Enemy enemy = Instantiate(_enemyPrefab, transform.position, transform.rotation);
+            enemy.Init(_colorChanger.DefaultColor);
             yield return new WaitForSeconds(_spawnTimer);
         }
     }

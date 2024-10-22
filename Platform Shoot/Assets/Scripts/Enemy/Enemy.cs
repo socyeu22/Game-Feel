@@ -13,11 +13,13 @@ public class Enemy : MonoBehaviour
     // private int _currentDirection;
 
     private Rigidbody2D _rigidBody;
+    private ColorChanger _colorChanger;
 
     private void Awake()
     {
         _rigidBody = GetComponent<Rigidbody2D>();
         _movement = GetComponent<Movement>();
+        _colorChanger = GetComponent<ColorChanger>();
     }
 
     private void Start() {
@@ -42,7 +44,9 @@ public class Enemy : MonoBehaviour
     // private void Movement(){
     //     _movement.SetCurrentDirection(_currentDirection);
     // }
-
+    public void Init(Color color){
+        _colorChanger.SetDefaultColor(color);
+    }
     private IEnumerator ChangeDirectionRoutine()
     {
         while (true)

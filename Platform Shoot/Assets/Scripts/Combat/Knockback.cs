@@ -5,8 +5,8 @@ using System;
 
 public class Knockback : MonoBehaviour
 {
-    public Action OnKnockbackStart; // Sự kiện này sẽ được gọi khi đối tượng bị đầy lùi( sử dụng observer)
-    public Action OnKnockbackEnd; // Sự kiện này sẽ được gọi khi đối tượng hết bị đầy lùi( sử dụng observer)
+    public Action OnKnockbackStart; // Sự kiện này sẽ được gọi khi đối tượng bị đầy lùi( sử dụng observer), có thể gọi được ở nhiều nơi(các lớp khác)
+    public Action OnKnockbackEnd; // Sự kiện này sẽ được gọi khi đối tượng hết bị đầy lùi( sử dụng observer), có thể gọi được ở nhiều nơi(các lớp khác)
     [SerializeField] private float _knockbackTime = 0.2f; // Thời gian bị đầy lùi
 
     private Vector3 _hitDirection; // Hướng bị đầy lùi
@@ -29,7 +29,6 @@ public class Knockback : MonoBehaviour
     }
 
     public void GetKnockBack(Vector3 hitDirection, float knockbackThrust){
-        Debug.Log("Knockback");
         _hitDirection = hitDirection;
         _knockbackThrust = knockbackThrust;
 
