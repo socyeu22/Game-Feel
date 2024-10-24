@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float _moveSpeed = 10f;
     [SerializeField] private int _damageAmount = 1;
     [SerializeField] private float _knockbackThrust = 20f;
+    [SerializeField] private GameObject _hitVFX;
 
     private Vector2 _fireDirection;
 
@@ -43,6 +44,10 @@ public class Bullet : MonoBehaviour
 
         Flash flash = other.gameObject.GetComponent<Flash>();
         flash?.StartFalsh();
+
+        GameObject hitVFX = Instantiate(_hitVFX, transform.position, transform.rotation);
+
         _gun.ReleaseBulletFromPool(this);
+
     }
 }

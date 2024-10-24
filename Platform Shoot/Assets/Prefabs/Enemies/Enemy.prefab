@@ -20,7 +20,7 @@ GameObject:
   - component: {fileID: 982448421549409262}
   m_Layer: 0
   m_Name: Enemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -69,7 +69,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e652642db6260344cb636626629dc1de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _splaterPrefab: {fileID: 2890446394207292239, guid: 18cf53d41397a4db4be9a234b4f1a25e, type: 3}
+  _splatterPrefab: {fileID: 2890446394207292239, guid: 18cf53d41397a4db4be9a234b4f1a25e, type: 3}
   _deathVFX: {fileID: 5119521532536920189, guid: ed496a46ed12d4035b18ed3363d40efd, type: 3}
   _startingHealth: 3
 --- !u!50 &-6445784336495608663

@@ -49,6 +49,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _moveSpeed: 30
   _damageAmount: 1
+  _knockbackThrust: 20
+  _hitVFX: {fileID: 6054654701448848418, guid: ad6866265513649fb93dd7c46bd4c466, type: 3}
 --- !u!212 &3373200371414082845
 SpriteRenderer:
   m_ObjectHideFlags: 0
