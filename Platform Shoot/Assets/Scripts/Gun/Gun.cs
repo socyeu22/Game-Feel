@@ -16,6 +16,8 @@ public class Gun : MonoBehaviour
     [SerializeField] private Transform _bulletSpawnPoint;
     [SerializeField] private Bullet _bulletPrefab;
     [SerializeField] private float _gunFireCD = .5f; // Biến này dùng để điều chỉnh tốc độ bắn của súng(thời gian giữa 2 lần bắn)
+    [SerializeField] private GameObject _muzzleFlash; // Hiệu ứng chớp sáng khi bắn
+    [SerializeField] private float _muzzleFlashTime; // Thời gian chớp sáng khi bắn
 
     private Vector2 _mousePos;
     private float _lastFireTime = 0f; // Biến này dùng để lưu thời gian bắn cuối cùng của súng
@@ -69,6 +71,7 @@ public class Gun : MonoBehaviour
         OnShoot += ResetLastFireTime;//Đăng ký hàm ShootProjectile vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot += FireAnimation; // Đăng ký hàm FireAnimation vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot += GunScreenShake; // Đăng ký hàm ShakeCamera vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
+        OnShoot += MuzzleFlashHandler;
     }
 
     private void OnDisable() {
@@ -76,6 +79,7 @@ public class Gun : MonoBehaviour
         OnShoot -= ResetLastFireTime; // Hủy đăng ký hàm ShootProjectile vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot -= FireAnimation; // Hủy đăng ký hàm FireAnimation vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot -= GunScreenShake; // Hủy đăng ký hàm ShakeCamera vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
+        OnShoot -= MuzzleFlashHandler;
     }
 
     private void Shoot()
@@ -120,5 +124,19 @@ public class Gun : MonoBehaviour
         Vector2 direction = PlayerController.Instance.transform.InverseTransformPoint(_mousePos); // Đây là một cách tính góc quay của súng khác, chúng ta sẽ sử dụng hàm InverseTransformPoint để chuyển đổi vị trí của chuột từ thế giới 2D về không gian cục bộ của người chơi
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg; // Tính toán góc quay của súng dựa theo vector direction và chuyển đổi từ radian sang độ
         transform.localRotation = Quaternion.Euler(0, 0, angle); // Gán góc quay cho súng
+    }
+
+
+    private IEnumerator MuzzleFlash()
+    {
+        if(_muzzleFlash.activeSelf) yield break; // Nếu hiệu ứng chớp sáng đang hoạt động thì thoát khỏi hàm
+        _muzzleFlash.SetActive(true);
+        yield return new WaitForSeconds(_muzzleFlashTime);
+        _muzzleFlash.SetActive(false);
+    }
+
+    private void MuzzleFlashHandler()
+    {
+        StartCoroutine(MuzzleFlash());
     }
 }
