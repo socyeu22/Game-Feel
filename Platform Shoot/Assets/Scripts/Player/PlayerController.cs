@@ -89,12 +89,13 @@ public class PlayerController : MonoBehaviour
             _rigidBody.AddForce(new Vector2(0f, -_extraGravity * Time.deltaTime));
         }
     }
-
+    
+    // Hàm này sẽ gọi để lấy Input từ người chơi được quy định trong PlayerInput.cs
     private void GatherInput()
     {
         // float moveX = Input.GetAxis("Horizontal");
         // _movement = new Vector2(moveX * _moveSpeed, _rigidBody.velocity.y);
-        _frameInput = _playerInput.FrameInput;
+        _frameInput = _playerInput.FrameInput; // Set giá trị của _frameInput bằng giá trị FrameInput từ PlayerInput.cs
         // _movement = new Vector2(_frameInput.Move.x * _moveSpeed, _rigidBody.velocity.y);
 
     }

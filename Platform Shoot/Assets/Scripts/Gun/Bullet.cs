@@ -4,16 +4,16 @@ using UnityEngine;
 
 public class Bullet : MonoBehaviour
 {
-    [SerializeField] private float _moveSpeed = 10f;
-    [SerializeField] private int _damageAmount = 1;
-    [SerializeField] private float _knockbackThrust = 20f;
-    [SerializeField] private GameObject _hitVFX;
+    [SerializeField] private GameObject _bulletVFX; // Prefab của hiệu ứng khi nổ tung viên đạn khi va chạm
+    [SerializeField] private float _moveSpeed = 10f; // Tốc độ di chuyển của viên đạn
+    [SerializeField] private int _damageAmount = 1; //Sát thương của viên đạn
+    [SerializeField] private float _knockbackThrust = 20f; //Lực đẩy lùi tác động lên đối tượng trúng đạn
 
-    private Vector2 _fireDirection;
+    private Vector2 _fireDirection; // Hướng bắn của viên đạn(sử dụng để tác động lực đẩy lùi)
 
-    private Rigidbody2D _rigidBody;
+    private Rigidbody2D _rigidBody; //RIgidbody của viên đạn
 
-    private Gun _gun;
+    private Gun _gun; // Tham chiếu đều đối tượng Gun
 
     private void Awake()
     {
@@ -36,6 +36,8 @@ public class Bullet : MonoBehaviour
 
 
     private void OnTriggerEnter2D(Collider2D other) {
+        GameObject hitVFX = Instantiate(_bulletVFX, transform.position, transform.rotation);
+
         Health health = other.gameObject.GetComponent<Health>();
         health?.TakeDamage(_damageAmount);
 
@@ -45,7 +47,6 @@ public class Bullet : MonoBehaviour
         Flash flash = other.gameObject.GetComponent<Flash>();
         flash?.StartFalsh();
 
-        GameObject hitVFX = Instantiate(_hitVFX, transform.position, transform.rotation);
 
         _gun.ReleaseBulletFromPool(this);
 

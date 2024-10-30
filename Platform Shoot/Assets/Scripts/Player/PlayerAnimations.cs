@@ -7,7 +7,7 @@ using UnityEngine;
 public class PlayerAnimations : MonoBehaviour
 {
     [SerializeField] private ParticleSystem _moveDustVFX;
-    [SerializeField] private ParticleSystem _jumpDustVFX;
+    [SerializeField] private ParticleSystem _poofDustVFX;
     [SerializeField] private Transform _characterSpriteTransform;
     [SerializeField] private Transform _cowboyHatSpriteTransform;
     [SerializeField] private float _tiltAngle = 10f;
@@ -17,19 +17,19 @@ public class PlayerAnimations : MonoBehaviour
     
     private Vector2 _velocityBeforePhysicsUpdate; //Vận tốc của player trước khi cập nhật vật lý
     private Rigidbody2D _rigidbody;
-    private CinemachineImpulseSource[] _impulseSources;
+    private CinemachineImpulseSource _impulseSource;
 
     private void Awake() {
         _rigidbody = GetComponent<Rigidbody2D>();
-        _impulseSources = GetComponents<CinemachineImpulseSource>();
+        _impulseSource = GetComponent<CinemachineImpulseSource>();
     }
 
     private void OnEnable() {
-        PlayerController.OnJump += PlayProofDustVFX;
+        PlayerController.OnJump += PlayPoofDustVFX; // Đăng ký sư kiện OnJump của PlayerController
     }
 
     private void OnDisable() {
-        PlayerController.OnJump -= PlayProofDustVFX;
+        PlayerController.OnJump -= PlayPoofDustVFX; // Huỷ đăng ký sự kiện OnJump của PlayerController
     }
 
     private void FixedUpdate() {
@@ -38,8 +38,8 @@ public class PlayerAnimations : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D other) {
         if(_velocityBeforePhysicsUpdate.y < _yLandVelocityCheck) {
-            PlayProofDustVFX();
-            _impulseSources[_impulseSources.Length - 1].GenerateImpulse();
+            PlayPoofDustVFX();
+            _impulseSource.GenerateImpulse();
         }
     }
     private void Update() {
@@ -47,13 +47,14 @@ public class PlayerAnimations : MonoBehaviour
         ApplyTilt();
     }
 
+    // Hàm phát hiện di chuyển và kích hoạt hiệu ứng bụi
     private void DetectMoveDust() {
-        if(PlayerController.Instance.CheckGrounded()) {
-            if(!_moveDustVFX.isPlaying) {
+        if(PlayerController.Instance.CheckGrounded()) { //Kiểm tra nhân vật có đang đứng trên mặt đất không
+            if(!_moveDustVFX.isPlaying) { // Nếu đứng trên mặt đất và đang không phát hiệu ứng bụi thì hiện hiệu ứng bụi(vì đã set up trong particle system là phát bụi khi đối tượng đi được một khoảng cách nhất định nên không cần kiểm tra đối tượng có đang di chuyển không)
                 _moveDustVFX.Play();
             }
         } else {
-            if(_moveDustVFX.isPlaying) {
+            if(_moveDustVFX.isPlaying) { // nếu đối tượng không trên mặt đất và đối VFX đang phát thì tắt VFX
                 _moveDustVFX.Stop();
             }
         }
@@ -68,16 +69,18 @@ public class PlayerAnimations : MonoBehaviour
         } else {
             targetAngle = 0;
         }
-        Quaternion currentCharacterRotation = _characterSpriteTransform.rotation;
-        Quaternion targetCharactorRotation = Quaternion.Euler(currentCharacterRotation.eulerAngles.x, currentCharacterRotation.eulerAngles.y, targetAngle);
-        _characterSpriteTransform.rotation = Quaternion.Lerp(currentCharacterRotation, targetCharactorRotation, _tiltSpeed * Time.deltaTime);
+        //Player sprite tilt
+        Quaternion currentCharacterRotation = _characterSpriteTransform.rotation; // Lấy góc quay hiệu tại của nhân vật
+        Quaternion targetCharacterRotation = Quaternion.Euler(currentCharacterRotation.eulerAngles.x, currentCharacterRotation.eulerAngles.y, targetAngle); //Giữ nguyên góc quay theo trục x và y, chỉ thay đối góc quay theo trục z = targetAngle
+        _characterSpriteTransform.rotation = Quaternion.Lerp(currentCharacterRotation, targetCharacterRotation, _tiltSpeed * Time.deltaTime); //Set góc quay mới cho nhân vật
 
+        //Cowboy hat sprite tilt, tương tự như character sprite tilt nhưng góc nghiêng ngược lại và có biến _cowboyHatTiltModifer để điều chỉnh góc nghiêng
         Quaternion currentHatRotation = _cowboyHatSpriteTransform.rotation;
         Quaternion targetHatRotation = Quaternion.Euler(currentHatRotation.eulerAngles.x, currentHatRotation.eulerAngles.y, -targetAngle /_cowboyHatTiltModifer);
         _cowboyHatSpriteTransform.rotation = Quaternion.Lerp(currentHatRotation, targetHatRotation, _tiltSpeed * _cowboyHatTiltModifer * Time.deltaTime);
     }
 
-    private void PlayProofDustVFX() {
-        _jumpDustVFX.Play();
+    private void PlayPoofDustVFX() {
+        _poofDustVFX.Play();
     }
 }

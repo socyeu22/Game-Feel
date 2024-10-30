@@ -19,6 +19,7 @@ public class Gun : MonoBehaviour
     [SerializeField] private GameObject _muzzleFlash; // Hiệu ứng chớp sáng khi bắn
     [SerializeField] private float _muzzleFlashTime; // Thời gian chớp sáng khi bắn
 
+    private Coroutine _muzzleFlashRoutine; // Coroutine này dùng để lưu trữ Coroutine của hiệu ứng chớp sáng khi bắn
     private Vector2 _mousePos;
     private float _lastFireTime = 0f; // Biến này dùng để lưu thời gian bắn cuối cùng của súng
     private static readonly int FIRE_HASH = Animator.StringToHash("Fire"); // Sư dụng để lấy Hash của Animation trong Animator, việc này giúp tối ưu hiệu suất mỗi lần gọi hàm Play của Animator, vì nó sẽ truyền vào Hash thay vì chuỗi
@@ -71,7 +72,7 @@ public class Gun : MonoBehaviour
         OnShoot += ResetLastFireTime;//Đăng ký hàm ShootProjectile vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot += FireAnimation; // Đăng ký hàm FireAnimation vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot += GunScreenShake; // Đăng ký hàm ShakeCamera vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
-        OnShoot += MuzzleFlashHandler;
+        OnShoot += MuzzleFlash; // Đăng ký hàm MuzzleFlash vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
     }
 
     private void OnDisable() {
@@ -79,7 +80,7 @@ public class Gun : MonoBehaviour
         OnShoot -= ResetLastFireTime; // Hủy đăng ký hàm ShootProjectile vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot -= FireAnimation; // Hủy đăng ký hàm FireAnimation vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
         OnShoot -= GunScreenShake; // Hủy đăng ký hàm ShakeCamera vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
-        OnShoot -= MuzzleFlashHandler;
+        OnShoot -= MuzzleFlash; // Hủy đăng ký hàm MuzzleFlash vào sự kiện OnShoot(như một người quan sát trong Observer Pattern)
     }
 
     private void Shoot()
@@ -126,17 +127,20 @@ public class Gun : MonoBehaviour
         transform.localRotation = Quaternion.Euler(0, 0, angle); // Gán góc quay cho súng
     }
 
-
-    private IEnumerator MuzzleFlash()
+    // Hàm này chạy hoặc dừng chạy Couroutine MuzzleFlashRoutine
+    private void MuzzleFlash()
     {
-        if(_muzzleFlash.activeSelf) yield break; // Nếu hiệu ứng chớp sáng đang hoạt động thì thoát khỏi hàm
+        if(_muzzleFlashRoutine != null) { //Nếu Coroutine đã chạy thì dừng Coroutine
+            StopCoroutine(_muzzleFlashRoutine); // Dừng Coroutine
+        }
+        _muzzleFlashRoutine = StartCoroutine(MuzzleFlashRoutine()); // Gán Coroutine mới cho _muzzleFlashRoutine và kích hoạt Coroutine
+    }
+
+    // Hàm này dùng để kích hoạt hiệu ứng chớp sáng khi bắn
+    private IEnumerator MuzzleFlashRoutine()
+    {
         _muzzleFlash.SetActive(true);
         yield return new WaitForSeconds(_muzzleFlashTime);
         _muzzleFlash.SetActive(false);
-    }
-
-    private void MuzzleFlashHandler()
-    {
-        StartCoroutine(MuzzleFlash());
     }
 }
