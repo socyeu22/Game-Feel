@@ -109,14 +109,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 843408996970680283}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.20278728, w: 0.97922283}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -0.069999695, y: -0.26999998, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4151112157567940879}
   m_Father: {fileID: 5633602010712001707}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -23.4}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &8242107830006702183
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -260,10 +260,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b7bf6d34d736d42eda3cc146cfca0dc2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  __spotlightHead: {fileID: 843408996970680283}
-  _rotationSpeed: 20
+  _spotlightHead: {fileID: 843408996970680283}
+  _rotationSpeed: 10
+  _discoRotationSpeed: 150
   _maxRotation: 45
-  _light2D: {fileID: 8798193666290289772}
 --- !u!1 &8534679748713772476
 GameObject:
   m_ObjectHideFlags: 0
@@ -312,7 +312,7 @@ MonoBehaviour:
   m_LightType: 3
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.298
-  m_Color: {r: 0.90588236, g: 0.3864843, b: 0.16470589, a: 1}
+  m_Color: {r: 0.018912422, g: 0.8018868, b: 0.028043473, a: 1}
   m_Intensity: 5.13
   m_LightVolumeIntensity: 1
   m_LightVolumeIntensityEnabled: 0
