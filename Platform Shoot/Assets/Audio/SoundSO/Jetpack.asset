@@ -10,12 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 801e8f4afc8624eec9c36fcfd9adffd7, type: 3}
-  m_Name: Fight Music
+  m_Name: Jetpack
   m_EditorClassIdentifier: 
-  AudioType: 1
-  Clip: {fileID: 8300000, guid: c4659c285e79b415fbd08f981ef63a55, type: 3}
-  Loop: 1
+  AudioType: 0
+  Clip: {fileID: 8300000, guid: 2d726e2f24f684375a2a61db4ac035ee, type: 3}
+  Loop: 0
   RandommizePitch: 0
   RandomPitchRangeModifier: 0.1
-  Volume: 1
+  Volume: 2.21
   Pitch: 1

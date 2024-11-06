@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 public class PlayerController : MonoBehaviour
@@ -8,8 +9,10 @@ public class PlayerController : MonoBehaviour
 
     public Vector2 MoveInput => _frameInput.Move;
     public static Action OnJump;
+    public static Action OnJetpack;
     public static PlayerController Instance;
 
+    [SerializeField] private TrailRenderer _jetpackTrailRenderer;
     [SerializeField] private Transform _feetTransform; // Đây là transform của hộp dưới chân nhân vật, dùng để kiểm tra xem nhân vật có đang đứng trên mặt đất không
     [SerializeField] private Vector2 _groundCheck; // Kích thước của hộp kiểm tra xem nhân vật có đang đứng trên mặt đất không
     [SerializeField] private LayerMask _groundLayer; // Layer của mặt đất
@@ -18,18 +21,22 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _extraGravity = 700f; // Trọng lực thêm khi nhân vật rơi xuống
     [SerializeField] private float _gravityDelay = 0.2f; // Thời gian trước khi trọng lực thêm được áp dụng(sau khi nhảy lên được 0.2s thì sẽ áp dụng lực thêm)
     [SerializeField] private float _coyoteTime = 0.5f; // Thời gian nhân vật có thế nhảy sau khi rời khỏi mặt đất
+    [SerializeField] private float _jetpackTime = 0.6f; // Thời gian nhân vật có thể sử dụng jetpack sau khi nhảy
+    [SerializeField] private float _jetpackStrength = 11f;
     private float _coyoteTimer; // Biến này dùng để đếm thời gian nhân vật rời khởi mặt đất dùng để so sánh với _coyoteTime 
     private bool _doubleJumpAvailable = true;
     private float _timeInAir; // Thời gian nhân vật ở trạn thái trên không
 
     private PlayerInput _playerInput;
     private FrameInput _frameInput;
+    private Coroutine _jetpackRoutine;
 
     // private bool _isGrounded = false;
     // private Vector2 _movement;
 
     private Rigidbody2D _rigidBody; // Rigidbody của nhân vật, cũng chính là Rigidbody ở Movement.cs vì cũng gắn vào cùng GameObject Player
     private Movement _movement; // Tham chiếu đến component Movement của chính GameObject Player cũng chứa PlayerController này
+
 
     public void Awake() {
         if (Instance == null) { Instance = this; }
@@ -40,10 +47,12 @@ public class PlayerController : MonoBehaviour
     }
     private void OnEnable(){
         OnJump += ApplyJumpForce;
+        OnJetpack += StartJetpack;
     }
 
     private void OnDisable(){
         OnJump -= ApplyJumpForce;
+        OnJetpack -= StartJetpack;
     }
 
     private void Update()
@@ -54,6 +63,7 @@ public class PlayerController : MonoBehaviour
         HandleJump();
         HandleSpriteFlip();
         GravityDelay();
+        Jetpack();
     }
     private void OnDrawGizmos() {
         Gizmos.color = Color.red;
@@ -152,5 +162,27 @@ public class PlayerController : MonoBehaviour
         {
             transform.eulerAngles = new Vector3(0f, 0f, 0f);
         }
-    } 
+    }
+
+    private void Jetpack() {
+        if(!_frameInput.Jetpack || _jetpackRoutine != null) return;
+        OnJetpack?.Invoke();
+    }
+
+    private void StartJetpack() {
+        _jetpackTrailRenderer.emitting = true;
+        _jetpackRoutine = StartCoroutine(JetpackRoutine());
+
+    }
+
+    private IEnumerator JetpackRoutine() {
+        float jetTime = 0f;
+        while(jetTime <_jetpackTime) {
+            jetTime += Time.deltaTime;
+            _rigidBody.velocity = Vector2.up * _jetpackStrength;
+            yield return null;
+        }
+        _jetpackTrailRenderer.emitting = false;
+        _jetpackRoutine = null;
+    }
 }

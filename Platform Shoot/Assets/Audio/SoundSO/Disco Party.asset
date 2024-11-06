@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 801e8f4afc8624eec9c36fcfd9adffd7, type: 3}
   m_Name: Disco Party
   m_EditorClassIdentifier: 
-  AudioType: 0
+  AudioType: 1
   Clip: {fileID: 8300000, guid: afa4760316cb44916aac4fa1a7e9401c, type: 3}
   Loop: 0
   RandommizePitch: 0

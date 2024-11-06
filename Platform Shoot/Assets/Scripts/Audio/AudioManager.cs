@@ -23,6 +23,7 @@ public class AudioManager : MonoBehaviour
     private void OnEnable() {
         Gun.OnShoot += Gun_OnShoot; // Đăng ký quan sát cho hàm Gun_OnShoot khi súng bắn
         PlayerController.OnJump += PlayerController_OnJump; // Đăng ký quan sát cho hàm PlayerController_OnJump khi nhân vật nhảy
+        PlayerController.OnJetpack += PlayerController_OnJetpack; // Đăng ký quan sát cho hàm PlayerController_OnJetpack khi nhân vật sử dụng jetpack
         Health.OnDeath += Health_OnDeath; // Đăng ký quan sát cho hàm Health_OnDeath
         DiscoBallManager.OnDiscoBallHitEvent += DiscoBallMusic; // Đăng ký quan sát cho hàm DiscoBallMusic khi bóng disco va chạm
     }
@@ -30,6 +31,7 @@ public class AudioManager : MonoBehaviour
     private void OnDisable() {
         Gun.OnShoot -= Gun_OnShoot;
         PlayerController.OnJump -= PlayerController_OnJump;
+        PlayerController.OnJetpack -= PlayerController_OnJetpack;
         Health.OnDeath -= Health_OnDeath;
         DiscoBallManager.OnDiscoBallHitEvent -= DiscoBallMusic;
     }
@@ -183,6 +185,10 @@ public class AudioManager : MonoBehaviour
         float soundLength = _soundCollection.DiscoParty[0].Clip.length; // Lấy độ dài của âm thanh DiscoParty(vì mảng DiscoParty chỉ chứa một âm thanh nên lấy âm thanh đầu tiên)
         // Invoke("FightMusic", soundLength); // Sau khi hết thời gian phát của DiscoParty thì chuyển về FightMusic
         Utils.RunAfterDelay(this, soundLength, FightMusic); // Sau khi hết thời gian phát của DiscoParty thì chuyển về FightMusic(sử dụng FightMusic như một hàm delegate action truyền vào hàm RunAfterDelay)
+    }
+
+    private void PlayerController_OnJetpack() {
+        PlayRandomSound(_soundCollection.Jetpack);
     }
     #endregion
 }
