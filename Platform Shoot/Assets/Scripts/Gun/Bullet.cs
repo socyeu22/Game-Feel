@@ -42,7 +42,7 @@ public class Bullet : MonoBehaviour
         iHitable?.TakeHit();
 
         IDamageable iDamageable = other.gameObject.GetComponent<IDamageable>();
-        iDamageable?.TakeDamage(_damageAmount, _knockbackThrust);
+        iDamageable?.TakeDamage(transform.position ,_damageAmount, _knockbackThrust);
         // Health health = other.gameObject.GetComponent<Health>();
         // health?.TakeDamage(_damageAmount);
 
@@ -54,6 +54,5 @@ public class Bullet : MonoBehaviour
 
 
         _gun.ReleaseBulletFromPool(this);
-
     }
 }

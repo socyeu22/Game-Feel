@@ -8,13 +8,14 @@ public class PlayerInput : MonoBehaviour
 {
     public FrameInput FrameInput {get; private set;}
     private PlayerInputActions _playerInputActions;
-    private InputAction _move, _jump, _jetpack;
+    private InputAction _move, _jump, _jetpack, _grenade;
 
     private void Awake(){
         _playerInputActions = new PlayerInputActions();
         _move = _playerInputActions.Player.Move;
         _jump = _playerInputActions.Player.Jump;
         _jetpack = _playerInputActions.Player.Jetpack;
+        _grenade = _playerInputActions.Player.Grenade;
     }
 
     private void OnEnable(){ // Đây là phương thức được gọi khi script được kích hoạt
@@ -35,6 +36,7 @@ public class PlayerInput : MonoBehaviour
             Move = _move.ReadValue<Vector2>(), // Lấy giá trị của InputAction _move
             Jump = _jump.WasPressedThisFrame(), // Lấy giá trị của InputAction _jump
             Jetpack = _jetpack.WasPressedThisFrame(), // Lấy giá trị của InputAction _jetpack
+            Grenade = _grenade.WasPressedThisFrame(), // Lấy giá trị của InputAction _grenade
         };
     }
 }
@@ -43,4 +45,5 @@ public struct FrameInput{
     public Vector2 Move; // Vector2 này sẽ chứa giá trị của trục x và y của input move
     public bool Jump; // Biến này sẽ chứa giá trị của input jump
     public bool Jetpack;
+    public bool Grenade;
 }

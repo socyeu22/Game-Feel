@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 3683578604102022092}
   - component: {fileID: 1766560078879127524}
   m_Layer: 0
-  m_Name: Splater
+  m_Name: Splatter
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

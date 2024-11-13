@@ -7,6 +7,8 @@ using UnityEngine.PlayerLoop;
 
 public class AudioManager : MonoBehaviour
 {
+
+    public static AudioManager Instance; // Biến static dùng để lưu trữ instance của AudioManager
     [Range(0f, 2f)]
     [SerializeField] private float _masterVolume = 1f;// Biến dùng để điều chỉnh âm lượng của âm thanh chung
     [SerializeField] private SoundCollectionSO _soundCollection; // Biến này dùng để lưu trữ các âm thanh (có thể là các chuỗi âm thanh) để phát cho các sự kiện khác nhau
@@ -16,6 +18,14 @@ public class AudioManager : MonoBehaviour
     private AudioSource _currentMusic; // Biến này dùng để lưu âm thanh của nhạc đang phát(không phải âm thanh ngắn như sfx), dùng để kiểm soát chế độ nhạc FightMusic và DiscoBallMusic, chỉ dùng khi loại AudioType là Music
 
     #region Unity Methods
+
+    private void Awake() {
+        if(Instance == null) { // Nếu instance chưa được gán thì gán instance cho biến này
+            Instance = this;
+        } else { // Nếu instance đã được gán thì hủy game obj hiện tại
+            Destroy(gameObject);
+        }
+    }
     private void Start() {
         FightMusic(); // Phát nhạc FightMusic ngay khi bắt đầu game
     }
@@ -24,16 +34,18 @@ public class AudioManager : MonoBehaviour
         Gun.OnShoot += Gun_OnShoot; // Đăng ký quan sát cho hàm Gun_OnShoot khi súng bắn
         PlayerController.OnJump += PlayerController_OnJump; // Đăng ký quan sát cho hàm PlayerController_OnJump khi nhân vật nhảy
         PlayerController.OnJetpack += PlayerController_OnJetpack; // Đăng ký quan sát cho hàm PlayerController_OnJetpack khi nhân vật sử dụng jetpack
-        Health.OnDeath += Health_OnDeath; // Đăng ký quan sát cho hàm Health_OnDeath
+        Health.OnDeath += HandleDeath; // Đăng ký quan sát cho hàm Health_OnDeath
         DiscoBallManager.OnDiscoBallHitEvent += DiscoBallMusic; // Đăng ký quan sát cho hàm DiscoBallMusic khi bóng disco va chạm
+        Gun.OnGrenadeShoot += Gun_OnGrenadeShoot; // Đăng ký quan sát cho hàm Gun_OnLaunchGrenade khi súng bắn lựu đạn
     }
 
     private void OnDisable() {
         Gun.OnShoot -= Gun_OnShoot;
         PlayerController.OnJump -= PlayerController_OnJump;
         PlayerController.OnJetpack -= PlayerController_OnJetpack;
-        Health.OnDeath -= Health_OnDeath;
+        Health.OnDeath -= HandleDeath;
         DiscoBallManager.OnDiscoBallHitEvent -= DiscoBallMusic;
+        Gun.OnGrenadeShoot -= Gun_OnGrenadeShoot;
     }
     #endregion
 
@@ -171,6 +183,34 @@ public class AudioManager : MonoBehaviour
     private void Health_OnDeath(Health health) {
         PlayRandomSound(_soundCollection.Splat);
     }
+
+    private void Health_OnDeath() {
+        PlayRandomSound(_soundCollection.Splat);
+    }
+
+    private void PlayerController_OnJetpack() {
+        PlayRandomSound(_soundCollection.Jetpack);
+    }
+
+    private void Gun_OnGrenadeShoot() {
+        PlayRandomSound(_soundCollection.GrenadeShoot);
+    }
+
+    public void Grenade_OnExplode() {
+        PlayRandomSound(_soundCollection.GrenadeExplosion);
+    }
+
+    public void Grenade_OnBeep() {
+        PlayRandomSound(_soundCollection.GrenadeBeep);
+    }
+
+    public void Enemy_OnPlayerHit() {
+        PlayRandomSound(_soundCollection.PlayerHit);
+    }
+
+    public void AudioManager_MegaKill() {
+        PlayRandomSound(_soundCollection.Megakill);
+    }
     #endregion
 
     #region Music
@@ -187,8 +227,35 @@ public class AudioManager : MonoBehaviour
         Utils.RunAfterDelay(this, soundLength, FightMusic); // Sau khi hết thời gian phát của DiscoParty thì chuyển về FightMusic(sử dụng FightMusic như một hàm delegate action truyền vào hàm RunAfterDelay)
     }
 
-    private void PlayerController_OnJetpack() {
-        PlayRandomSound(_soundCollection.Jetpack);
+    #endregion
+
+    #region Custom SFX Logic
+
+    private List<Health> _deathList = new List<Health>();
+    private Coroutine _deathCoroutine;
+
+    private void HandleDeath(Health health) {
+        bool isEnemy = health.GetComponent<Enemy>();
+        if(isEnemy) {
+            _deathList.Add(health);
+            if(_deathCoroutine == null) {
+                _deathCoroutine = StartCoroutine(DeathWindowRoutine());
+            }
+        }
+    }
+
+    private IEnumerator DeathWindowRoutine() {
+
+        yield return null;
+
+        int megaKillAmount = 3;
+        if(_deathList.Count >= megaKillAmount) {
+            AudioManager_MegaKill();
+        }
+
+        Health_OnDeath();
+        _deathList.Clear();
+        _deathCoroutine = null;
     }
     #endregion
 }

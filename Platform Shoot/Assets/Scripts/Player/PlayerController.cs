@@ -23,6 +23,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float _coyoteTime = 0.5f; // Thời gian nhân vật có thế nhảy sau khi rời khỏi mặt đất
     [SerializeField] private float _jetpackTime = 0.6f; // Thời gian nhân vật có thể sử dụng jetpack sau khi nhảy
     [SerializeField] private float _jetpackStrength = 11f;
+    [SerializeField] private float _maxFallSpeedVelocity = -20f;
     private float _coyoteTimer; // Biến này dùng để đếm thời gian nhân vật rời khởi mặt đất dùng để so sánh với _coyoteTime 
     private bool _doubleJumpAvailable = true;
     private float _timeInAir; // Thời gian nhân vật ở trạn thái trên không
@@ -39,7 +40,13 @@ public class PlayerController : MonoBehaviour
 
 
     public void Awake() {
-        if (Instance == null) { Instance = this; }
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
 
         _rigidBody = GetComponent<Rigidbody2D>();
         _playerInput = GetComponent<PlayerInput>();
@@ -74,6 +81,11 @@ public class PlayerController : MonoBehaviour
         ExtraGravity();
     }
 
+    // Hàm OnDestroy sẽ được gọi khi GameObject chứa script này bị Destroy
+    private void OnDestroy() {
+        Fade fade = FindObjectOfType<Fade>();
+        fade?.FadeInAndOut();
+    }
     public bool CheckGrounded()
     {
         Collider2D isGrounded = Physics2D.OverlapBox(_feetTransform.position, _groundCheck, 0f, _groundLayer);
@@ -97,6 +109,9 @@ public class PlayerController : MonoBehaviour
     private void ExtraGravity(){
         if(_timeInAir > _gravityDelay){
             _rigidBody.AddForce(new Vector2(0f, -_extraGravity * Time.deltaTime));
+        }
+        if(_rigidBody.velocity.y < _maxFallSpeedVelocity) {
+            _rigidBody.velocity = new Vector2(_rigidBody.velocity.x, _maxFallSpeedVelocity);
         }
     }
     

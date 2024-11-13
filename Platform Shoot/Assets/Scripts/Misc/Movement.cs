@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering.Universal;
 
 public class Movement : MonoBehaviour
 {
+
+    public bool CanMove => _canMove;
     [SerializeField] private float _moveSpeed = 10f; //Tốc độ di chuyển của đối tượng được gắn script
     private Rigidbody2D _rigidBody;
     private Knockback _knockback;
